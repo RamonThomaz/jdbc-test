@@ -2,24 +2,36 @@ package application;
 
 import db.DB;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 
 public class Program {
     public static void main(String[] args) {
         Connection conn = DB.getConnection();
-        Statement statement = null;
+        PreparedStatement statement = null;
         ResultSet resultSet = null;
 
         try {
-            statement = conn.createStatement();
-            resultSet = statement.executeQuery("SELECT * FROM department");
+            //Shows current table
+            statement = conn.prepareStatement("SELECT * FROM department");
+            resultSet = statement.executeQuery();
+
+            System.out.println("Current Table from Database:\nID:\tNAME:");
             while (resultSet.next()){
-                System.out.println("Department ID: " + resultSet.getInt("Id") + "; Department Name: " + resultSet.getString("Name"));
+                System.out.println(resultSet.getInt("Id") + "\t" + resultSet.getString("Name"));
             }
 
+            //Inserts a new department
+            statement = conn.prepareStatement("INSERT INTO department (Name) VALUES (?)");
+            statement.setString(1, "Agapys Tecnologia");
+            statement.executeUpdate();
+
+            statement = conn.prepareStatement("SELECT * FROM department");
+            resultSet = statement.executeQuery();
+
+            System.out.println("\nUpdated Table from Database:\nID:\tNAME:");
+            while (resultSet.next()){
+                System.out.println(resultSet.getInt("Id") + "\t" + resultSet.getString("Name"));
+            }
         }
         catch (SQLException e){
             e.printStackTrace();
